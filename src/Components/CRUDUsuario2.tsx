@@ -15,10 +15,9 @@ import UnidadResponsableService from '../Services/UsuarioService';
 
 //interfaz para modelar a los clientes
 interface UnidadResponsable {
-    idUsuario: number;
-    contraseña: string;
-    correo: string;
-    nombre: string;
+    idUnidadResponsable: number;
+    jefeUnidad: string;
+    numeroUnidadResponsable: number;
   }
 //Define la interfaz mascota con los campos necesarios para un registro
   interface Rol {
