@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import UnidadResponsableService from '../Services/UnidadResponsableService';
-<<<<<<< HEAD
+
 interface UnidadResponsable {
     idUnidadResponsable: number;
     jefeUnidad: string;
