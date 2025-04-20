@@ -11,7 +11,7 @@ import {Dialog} from 'primereact/dialog';
 import {InputText} from 'primereact/inputtext' ;
 import UsuarioService from '../Services/UsuarioService';
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
-import UnidadResponsableService from '../Services/UsuarioService';
+import UnidadResponsableService from '../Services/UnidadResponsableService';
 
 //interfaz para modelar a los clientes
 interface UnidadResponsable {
@@ -20,136 +20,137 @@ interface UnidadResponsable {
     numeroUnidadResponsable: number;
   }
 //Define la interfaz mascota con los campos necesarios para un registro
-  interface Rol {
-    idRol: number;
-    nombreRol: string;
-    permisos: string;
+interface Usuario {
+    idUsuario: number;
+    contraseña: string;
+    correo: string;
+    nombre: string;
     //se incluye el campo usuario como un objeto
-    usuario: Usuario;
+    unidadResponsable: UnidadResponsable;
   }
 
-  interface Permisos{
-    permiso: string;
+  interface Nombre{
+    nombre: string;
   }
-export default function CRUDRol() {
-    const emptyUsuario: Usuario = {
+export default function CRUDUsuario2() {
+    const emptyUnidadResponsable: UnidadResponsable = {
+        idUnidadResponsable: 0,
+        jefeUnidad: '',
+        numeroUnidadResponsable: ''
+    };
+    const emptyUsuario: Usuario = { 
         idUsuario: 0,   
         nombre: '',
         correo: '',
-        contraseña: ''
-    };
-    const emptyRol: Rol = { 
-        idRol: 0,
-        nombreRol: '',
-        permisos: '',
+        contraseña: '',
         //se inicializa el usuario
-        usuario: emptyUsuario
+        unidadResponsable: emptyUnidadResponsable
     };
     //Variables de estado
     //adicionadas para incluor el listado de los usuarios
-    const [usuarios, setUsuarios] = useState<Usuario[]>([]);
-    const [roles, setRoles] = useState<Rol[]>([]);//lista de roles
-    const [rol, setRol] = useState<Rol>(emptyRol);//rol seleccionado o en proceso de edicion 
-    const [rolDialog, setRolDialog] = useState<boolean>(false);//estado para mostrar el dialogo de edicion de rol
-    const [deleteRolDialog, setDeleteRolDialog] = useState<boolean>(false);//estado para mostrar el dialogo de confirmacion de eliminacion de rol
+    const [unidadesResponsables, setUnidadesResponsables] = useState<Usuario[]>([]);
+    const [usuarios, setUsuarios] = useState<Usuarios[]>([]);//lista de roles
+    const [usuario, setUsuarios] = useState<Usuarios>(emptyRol);//rol seleccionado o en proceso de edicion 
+    const [usuarioDialog, setUsuarioDialog] = useState<boolean>(false);//estado para mostrar el dialogo de edicion de rol
+    const [deleteUsuarioDialog, setDeleteUsuarioDialog] = useState<boolean>(false);//estado para mostrar el dialogo de confirmacion de eliminacion de rol
     const [submitted, setSubmitted] = useState<boolean>(false);//estado para indicar si se ha enviado el formulario
     const [globalFilter, setGlobalFilter] = useState<string>('');//filtro global para la tabla
     const toast = useRef<Toast>(null);//referencia al componente Toast para mostrar mensajes de exito o error
-    const dt = useRef<DataTable<Rol[]>>(null);//referencia a la tabla de datos
-    const permisos: Permisos[] = [
-        {permiso: 'Administrador'}, 
-        {permiso: 'Operador Avanzado'},
-        {permiso: 'Operador Basico'},
-        {permiso: 'Visualizador/supervisor'}
+    const dt = useRef<DataTable<Usuario[]>>(null);//referencia a la tabla de datos
+    const nombres: Nombres[] = [
+        {nombre: 'Administrador'}, 
+        {nombre: 'Operador Avanzado'},
+        {nombre: 'Operador Basico'},
+        {nombre: 'Visualizador/supervisor'}
     ];
-    const [selectedPermisos, setSelectedPermisos] = useState<Permisos | null>(null);//permisos seleccionados en el dialogo de edicion de rol
-    const [selectedUsuario, setSelectedUsuario] = useState<Usuario| null>(null);//usuarios seleccionados en la tabla
+    const [selectedNombres, setSelectedNombres] = useState<Nombres | null>(null);//permisos seleccionados en el dialogo de edicion de rol
+    const [selectedUnidadesResponsable, setSelectedUnidadesResponsable] = useState<Usuario| null>(null);//usuarios seleccionados en la tabla
     useEffect(() => {
-        UsuarioService.findAll().then((responseUs) => setUsuarios(responseUs.data));
-        RolService.findAll().then((response) => setRoles(response.data));//llama al servicio para obtener los roles y los usuarios
-    }, [selectedUsuario]);
+        UnidadesResponsableService.findAll().then((responseUs) => setUnidadesResponsable(responseUs.data));
+        UsuarioService.findAll().then((response) => setUsuario(response.data));//llama al servicio para obtener los roles y los usuarios
+    }, [selectedUnidadesResponsable]);
 
     const openNew = () => {
-        setRol(emptyRol);
+        setUsuario(emptyRol);
         setSubmitted(false);
-        setRolDialog(true);
+        setUsuarioDialog(true);
     };
 
     const hideDialog = () => {
         setSubmitted(false);
-        setRolDialog(false);
+        setUsuarioDialog(false);
     };
 
-    const hideDeleteRolDialog = () => {
-        setDeleteRolDialog(false);
+    const hideDeleteUsuarioDialog = () => {
+        setDeleteUsuarioDialog(false);
     };
 
-    const saveRol = async () => {
+    const saveUsuario = async () => {
         setSubmitted(true);
-        if (rol.nombreRol.trim()) {
-            const _roles = [...roles];
-            const _rol = {...rol};
-            if (rol.idRol) {
-                RolService.update(rol.idRol, rol);
-                const index = findIndexById(rol.idRol);
-                _roles[index] = _rol;
+        if (usuario.nombreUsuario.trim()) {
+            const _usuarios = [...usuarios];
+            const _usuario = {...usuario};
+            if (usuario.idUsuario) {
+                UsuarioService.update(usuario.idUsuario, usuario);
+                const index = findIndexById(usuario.idUsuario);
+                _usuarios[index] = _usuario;
                 toast.current?.show({ severity: 'success', 
-                    summary: 'Exito', detail: 'Rol actulizado', life: 3000 });
+                    summary: 'Exito', detail: 'Usuario actulizado', life: 3000 });
             } else {
-                _rol.idRol = await getIdRol(_rol);
-                _roles.push(_rol);
+                _usuario.idUsuario = await getIdUsuario(_usuario);
+                _roles.push(_usuario);
                 toast.current?.show({ severity: 'success', 
-                    summary: 'Exito', detail: 'Rol Creado', life: 3000 });
+                    summary: 'Exito', detail: 'Usuario Creado', life: 3000 });
             }
-            setRoles(_roles);
-            setRolDialog(false);
-            setRol(emptyRol);
+            setUsuario(_usuario);
+            setUsuarioDialog(false);
+            setUsuario(emptyUsuario);
         }
     };
 
-    const getIdRol = async (_rol: Rol) => {
-        let idRol = 0;
-        const newRol ={
-            nombreRol: _rol.nombreRol,
-            permisos: _rol.permisos,
-            usuario: _rol.usuario
+    const getIdUsuario = async (_usuario: Usuario) => {
+        let idUsuario = 0;
+        const newUsuario ={
+            nombreUsuario: _usuario.nombreUsuario,
+            nombre: _usuario.nombre,
+            unidadResponsable: _usuario.unidadResponsable
         }
-        await RolService.create(newRol).then((response) => {
-            idRol = response.data.idRol;
+        await UsuarioService.create(newUsuario).then((response) => {
+            idUsuario = response.data.idUsuario;
         }).catch((error) => {
             console.log(error);
         });
-        return idRol;
+        return idUsuario;
     };
 
-    const editRol = async (rol: Rol) => {
-        setRol({...rol});
-        setSelectedPermisos({"permiso": rol.permisos});
-        await RolService.findUsuarioById(rol.idRol).then((responseUs) => {
-            setSelectedPermisos(responseUs.data);
+    const editUsuario = async (usuario: Usuario) => {
+        setUsuario({...usuario});
+        setSelectedNombre({"nombre": usuario.nombre});
+        await UsuarioService.findUnidadesResponsableById(usuario.idUsuario).then((responseUs) => {
+            setSelectedNombre(responseUs.data);
         });
-        setRolDialog(true);
+        setUsuarioDialog(true);
     };
 
-    const confirmDeleteRol = (rol: Rol) => {
-        setRol(rol);
-        setDeleteRolDialog(true);
+    const confirmDeleteUsuario = (usuario: Usuario) => {
+        setUsuario(usuario);
+        setDeleteUsuarioDialog(true);
     };
 
-    const deleteRol = () => {
-        const _roles = roles.filter((val) => val.idRol !== rol.idRol);
-        RolService.delete(rol.idRol);
-        setRoles(_roles);
-        setDeleteRolDialog(false);
-        setRol(emptyRol);
+    const deleteUsuario = () => {
+        const _usuarios = usuarios.filter((val) => val.idUsuario !== rol.idUsuario);
+        UsuarioService.delete(usuario.idUsuario);
+        setUsuarios(_usuarios);
+        setDeleteUsuarioDialog(false);
+        setUsuario(emptyUsuario);
         toast.current?.show({ severity: 'success', summary: 'Resultado', 
-            detail: 'Rol eliminado', life: 3000 });
+            detail: 'Usuario eliminado', life: 3000 });
     };
 
-    const findIndexById = (idRol: number) => {
+    const findIndexById = (idUsuario: number) => {
         let index = -1;
-        for (let i = 0; i < roles.length; i++) {
-            if (roles[i].idRol === idRol) {
+        for (let i = 0; i < usuarios.length; i++) {
+            if (Usuarios[i].idUsuario === idUsuario) {
                 index = i;
                 break;
             }
@@ -162,25 +163,25 @@ export default function CRUDRol() {
 
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = (e.target && e.target.value) || ''; 
-        const _rol = {...rol};
-        _rol.nombreRol = val;
-        setRol(_rol);
+        const _usuario = {...usuario};
+        _usuario.nombreUsuario = val;
+        setUsuario(_usuario);
     };
 
-    const onUsuarioChange = (e: DropdownChangeEvent) => {
-        const _rol = {...rol};
-        const xusuario: Usuario = e.target.value;
-        setSelectedUsuario(xusuario);
-        _rol.usuario = xusuario;
-        setRol(_rol);
+    const onUnidadResponsableChange = (e: DropdownChangeEvent) => {
+        const _usuario = {...usuario};
+        const xunidadesResponsable: UnidadesResponsable = e.target.value;
+        setSelectedUnidadesResponsable(xunidadesResponsable);
+        _Usuario.unidadesResponsable = xunidadesResponsable;
+        setUsuario(_usuario);
     };
 
     const onPermisosChange = (e: DropdownChangeEvent) => {
-        const _rol = {...rol};
-        const xpermisos: Permisos = e.target.value;
-        setSelectedPermisos(xpermisos);
-        _rol.permisos = xpermisos.permiso;
-        setRol(_rol);
+        const _usuario = {...usuario};
+        const xnombre: Nombre = e.target.value;
+        setSelectedNombre(xnombre);
+        _Usuario.permisos = xusuario.permiso;
+        setUsuario(_usuario);
     };
     const leftToolbarTemplate = () => {
         return (
@@ -197,14 +198,14 @@ export default function CRUDRol() {
     const actionBodyTemplate = (rowData: Rol) => {
         return (
             <React.Fragment>
-                <Button icon="pi pi-pencil" rounded outlined className="mr-2" onClick={() => editRol(rowData)} />
-                <Button icon="pi pi-trash" rounded outlined severity="danger" onClick={() => confirmDeleteRol(rowData)} />
+                <Button icon="pi pi-pencil" rounded outlined className="mr-2" onClick={() => editUsuario(rowData)} />
+                <Button icon="pi pi-trash" rounded outlined severity="danger" onClick={() => confirmDeleteUsuario(rowData)} />
             </React.Fragment>
         );
     };
     const header = (
         <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
-            <h4 className="m-0">Gestion de roles</h4>
+            <h4 className="m-0">Gestion de usuario</h4>
             <IconField iconPosition="left">{}
                 <InputIcon className="pi pi-search" />{}
                 {}
@@ -213,7 +214,7 @@ export default function CRUDRol() {
             </IconField>
         </div>
     );
-    const rolDialogFooter = (
+    const usuarioDialogFooter = (
         <React.Fragment>
             {}
             <Button label="Cancelar" icon="pi pi-times" outlined onClick={hideDialog} />{}
@@ -223,8 +224,8 @@ export default function CRUDRol() {
     const deleteRolDialogFooter = (
         <React.Fragment>
             {}
-            <Button label="No" icon="pi pi-times" outlined onClick={hideDeleteRolDialog} />
-            <Button label="Si" icon="pi pi-check" severity="danger" onClick={deleteRol} />
+            <Button label="No" icon="pi pi-times" outlined onClick={hideDeleteUsuarioDialog} />
+            <Button label="Si" icon="pi pi-check" severity="danger" onClick={deleteUsuario} />
         </React.Fragment>
     );
     return (
@@ -232,52 +233,52 @@ export default function CRUDRol() {
             <Toast ref={toast} />
             <div className="card">
                 <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
-                <DataTable ref={dt} value={roles} dataKey="idRol" 
+                <DataTable ref={dt} value={usuario} dataKey="idRol" 
                 paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                 currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} roles" 
                 globalFilter={globalFilter} header={header}
                 >
-                    <Column field="idRol" header="ID Rol" sortable style={{ minWidth: '8rem' }}></Column>
-                    <Column field="nombreRol" header="Nombre Rol" sortable style={{ minWidth: '12rem' }}></Column>
+                    <Column field="idUsuario" header="ID Usuario" sortable style={{ minWidth: '8rem' }}></Column>
+                    <Column field="nombreUsuario" header="Nombre Usuario" sortable style={{ minWidth: '12rem' }}></Column>
                     <Column field="permisos" header="Permisos" sortable style={{ minWidth: '12rem' }}></Column>
                     <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
                 </DataTable>
             </div>
 
-            <Dialog visible={rolDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} 
-            header="Detalles del rol" modal className="p-fluid" footer={rolDialogFooter} onHide={hideDialog}>
+            <Dialog visible={usuarioDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} 
+            header="Detalles del usuario" modal className="p-fluid" footer={usuarioDialogFooter} onHide={hideDialog}>
                 <div className="field">
-                    <label htmlFor="Nombre Rol" className="font-bold">
-                        NombreRol
+                    <label htmlFor="Nombre Usuario" className="font-bold">
+                        NombreUsuario
                     </label>
-                    <InputText id="Nombre Rol" value={rol.nombreRol} onChange={(e) => onInputChange(e)} required autoFocus className={classNames({ 'p-invalid': 
-                        submitted && !rol.nombreRol })} />
-                    {submitted && !rol.nombreRol && <small className="p-error">El cargo del rol es requerido</small>}
+                    <InputText id="Nombre Usuario" value={usuario.nombreRol} onChange={(e) => onInputChange(e)} required autoFocus className={classNames({ 'p-invalid': 
+                        submitted && !usuario.nombreUsuario })} />
+                    {submitted && !usuario.nombreUsuario && <small className="p-error">El cargo del usuario es requerido</small>}
                 </div>
 
                 <div className="field">
-                    <label className="font-bold block mb-2">Usuario:{
-                        selectedUsuario?.nombre}</label>
-                    <Dropdown value={selectedUsuario} onChange={
-                        onUsuarioChange} options={usuarios} optionLabel="nombre"  
-                        placeholder="Seleccione un usuario"  className="w-full md:w-14rem" />
+                    <label className="font-bold block mb-2">UnidadesResponsable:{
+                        selectedUnidadesResponsable?.nombre}</label>
+                    <Dropdown value={selectedNombre} onChange={ 
+                    onNombreChange} options={nombre} optionLabel="nombre" 
+                        placeholder="Seleccione un nombre"  className="w-full md:w-14rem" />
                 </div>
 
                 <div className="field">
-                    <label className="font-bold block mb-2">Permisos:</label>
-                    <Dropdown value={selectedPermisos} onChange={onPermisosChange} 
-                    options={permisos} optionLabel="permiso" placeholder="Seleccione un permiso" className="w-full md:w-14rem" />
+                    <label className="font-bold block mb-2">Nombre:</label>
+                    <Dropdown value={selectedNombre} onChange={onNombreChange} 
+                    options={Nombre} optionLabel="nombre" placeholder="Seleccione un nombre" className="w-full md:w-14rem" />
                 </div>
             </Dialog>
 
-            <Dialog visible={deleteRolDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} 
-            header="Confirmar" modal footer={deleteRolDialogFooter} onHide={hideDeleteRolDialog}>
+            <Dialog visible={deleteUsuarioDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} 
+            header="Confirmar" modal footer={deleteUsuarioDialogFooter} onHide={hideDeleteUsuarioDialog}>
                 <div className="confirmation-content">
                     <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                    {rol && (
+                    {usuario && (
                         <span>
-                            ¿Estas seguro de eliminar <b>{rol.nombreRol}</b>?
+                            ¿Estas seguro de eliminar <b>{usuario.nombreUsuario}</b>?
                         </span>
                     )}
                 </div>
