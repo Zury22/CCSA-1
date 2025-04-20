@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import ActividadService from '../Services/ActividadService';
-interface Planificacion {
+interface Actividad {
     idActividad: number;
     descripcion: string;
     indicadorResultados: string;
