@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 import React, { useState, useEffect, useRef } from 'react';
 import { classNames } from 'primereact/utils';
 import { DataTable } from 'primereact/datatable';
@@ -12,7 +10,7 @@ import { InputIcon } from 'primereact/inputicon';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import PlanificacionService from '../Services/PlanificacionService';
->>>>>>> eaee85ff7709f199a151e67aef1f429b6b4c17ab
+
 
 interface Planificacion {
     idPlanificacion: number;

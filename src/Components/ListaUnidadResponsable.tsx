@@ -6,7 +6,7 @@ import UnidadResponsableService from '../Services/UnidadResponsableService';
 interface UnidadResponsable {
     idUnidadResponsable: number;
     jefeUnidad: string;
-    numeroUnidadResponsable: number;
+    nombreUnidadResponsable: string;
 }
 export default function ListaUnidadResponsable() {
     const [unidadResponsable, setUnidadResponsable] = useState<UnidadResponsable[]>([]);
@@ -21,8 +21,8 @@ export default function ListaUnidadResponsable() {
         <div className="card">
             <DataTable value={unidadResponsable} tableStyle={{ minWidth: '50rem' }}>
                 <Column field='idUnidadResponsable' header="ID Unidad Responsable"></Column>
-                <Column field='jefeUnidad' header="Jefe Unida"></Column>
-                <Column field='numeroUnidadResponsable' header="Numero Unidad Responsable"></Column>
+                <Column field='jefeUnidad' header="Jefe Unidad"></Column>
+                <Column field='nombreUnidadResponsable' header="Nombre Unidad Responsable"></Column>
             </DataTable>
         </div>
     );
