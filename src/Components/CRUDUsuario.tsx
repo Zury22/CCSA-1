@@ -12,6 +12,7 @@ import {Dialog} from 'primereact/dialog';
 import {InputText} from 'primereact/inputtext' ;
 import UsuarioService from '../Services/UsuarioService';
 
+
 interface Usuario {
   idUsuario: number;
   contraseña: string;
@@ -25,6 +26,11 @@ interface Rol {
   permisos: string;
 }
 
+interface UnidadResponsable {
+    idUnidadResponsable: number;
+    jefeUnidad: string;
+    nombreUnidadResponsable: string;
+}
 
 export default function CRUDUsuario() {
     const emptyUsuario: Usuario = {
@@ -35,6 +41,7 @@ export default function CRUDUsuario() {
     };
 //lista de roles
     const [listaRoles, setListaRoles] = useState<Rol[]>([]);
+    const [listaUnidadResponsable, setListaUnidadResponsable] = useState<UnidadResponsable[]>([]);
     const [usuarios, setUsuarios] = useState<Usuario[]>([]);
     const [usuario, setUsuario] = useState<Usuario>(emptyUsuario);
     const [usuarioDialog, setUsuarioDialog] = useState<boolean>(false);
@@ -130,6 +137,16 @@ export default function CRUDUsuario() {
         setUsuarioListado(true);
     };
 
+    const listarUnidadResponsable = (usuario: Usuario) => {
+        setUsuario({...usuario});
+        UsuarioService.findById(usuario.idUsuario).then((response) => {
+            setListaUnidadResponsable(response.data.UnidadResponsable); // Asignar la lista de roles al estado
+        }).catch(error => {
+            console.log(error);
+        })
+        setUsuarioListado(true);
+    };
+
     const editUsuario = (usuario: Usuario) => {
         setUsuario({ ...usuario });
         setUsuarioDialog(true);
@@ -139,7 +156,7 @@ export default function CRUDUsuario() {
         setUsuario(usuario);
         setDeleteUsuarioDialog(true);
     };
-
+//rol
     const deleteUsuario = () => {
         const _usuarios = usuarios.filter((val) => val.idUsuario !== 
         usuario.idUsuario);
@@ -198,6 +215,7 @@ export default function CRUDUsuario() {
         return (
             <React.Fragment>
                 <Button icon="pi pi-prime" style={{color: 'green'}}rounded outlined className='mr-2' onClick={()=> listarRoles(rowData)}/>
+                <Button icon="pi pi-users" style={{color: 'blue'}} rounded outlined className='mr-2' onClick={()=> listarUnidadResponsable(rowData)}/>
                 <Button icon="pi pi-pencil" rounded outlined className='mr-2' onClick={() => editUsuario(rowData)} />
                 <Button icon="pi pi-trash" rounded outlined severity="danger" onClick={() => confirmDeleteObjeto(rowData)} />
             </React.Fragment>
@@ -205,7 +223,7 @@ export default function CRUDUsuario() {
     };
     const header = (
         <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
-            <h4 className="m-0">Gestion de roles</h4>
+            <h4 className="m-0">Gestion de usuarios</h4>
             <IconField iconPosition="left">
                 <InputIcon className="pi pi-search" />
                  <InputText type="search" placeholder="Search..." onInput={(e) => {const target = e.target as HTMLInputElement; setGlobalFilter(target.value);}}  />
@@ -288,6 +306,14 @@ export default function CRUDUsuario() {
             onHide={hideListadoDialog}>
                 <div className="field">
                     <ul>{listaRoles.map(item => <li>{item.nombreRol}</li>)}</ul>
+                </div>
+            </Dialog>
+            <Dialog visible={usuarioListado} style={{ width: '32rem' }} 
+            breakpoints={{ '960px': '75vw', '641px': '90vw' }} 
+            header="Unidad responsable del usuario" modal className="p-fluid" 
+            onHide={hideListadoDialog}>
+                <div className="field">
+                    <ul>{listaUnidadResponsable.map(item => <li>{item.nombreUnidadResponsable}</li>)}</ul>
                 </div>
             </Dialog>
         </div>

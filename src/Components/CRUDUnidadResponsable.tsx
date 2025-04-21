@@ -17,17 +17,26 @@ interface UnidadResponsable {
     nombreUnidadResponsable: string;
 }
 
+interface Usuario {
+    idUsuario: number;
+    contraseña: string;
+    correo: string;
+    nombre: string;
+}
+
 export default function CRUDUnidadResponsable() {
     const emptyUnidadResponsable: UnidadResponsable = {
         idUnidadResponsable: 0,
         jefeUnidad: '',
         nombreUnidadResponsable: ''
     };
-
+    const [ListaUsuario, setListaUsuario] = useState<Usuario[]>([]);
     const [unidadesResponsables, setUnidadesResponsables] = useState<UnidadResponsable[]>([]);
     const [unidadResponsable, setUnidadResponsable] = useState<UnidadResponsable>(emptyUnidadResponsable);
     const [unidadResponsableDialog, setUnidadResponsableDialog] = useState<boolean>(false);
     const [deleteUnidadResponsableDialog, setDeleteUnidadResponsableDialog] = useState<boolean>(false);
+
+    const [unidadResponsableListado, setUnidadResponsableListado] = useState<boolean>(false);
     const [submitted, setSubmitted] = useState<boolean>(false);
     const [globalFilter, setGlobalFilter] = useState<string>('');
     const toast = useRef<Toast>(null);
@@ -42,6 +51,11 @@ export default function CRUDUnidadResponsable() {
         setSubmitted(false);
         setUnidadResponsableDialog(true);
     };
+
+    const hideListadoDialog = () => {
+        setSubmitted(false);
+        setUnidadResponsableListado(false);
+    }
 
     const hideDialog = () => {
         setSubmitted(false);
@@ -99,6 +113,16 @@ export default function CRUDUnidadResponsable() {
         });
         return id;
     };
+
+    const listarUsuarios = (unidad: UnidadResponsable) => {
+        setUnidadResponsable(unidad);
+        UnidadResponsableService.findUsuarioById(unidad.idUnidadResponsable).then((response) => {
+            setListaUsuario(response.data.usuarios);
+        }).catch((error) => {
+            console.log(error);
+        });
+        setUnidadResponsableListado(true);
+    }
 
     const editUnidadResponsable = (unidad: UnidadResponsable) => {
         setUnidadResponsable({ ...unidad });
@@ -164,6 +188,7 @@ export default function CRUDUnidadResponsable() {
     const actionBodyTemplate = (rowData: UnidadResponsable) => {
         return (
             <React.Fragment>
+                <Button icon="pi pi-prime" style={{ color: 'green' }} rounded outlined className='mr-2' onClick={() => listarUsuarios(rowData)} />
                 <Button icon="pi pi-pencil" rounded outlined className="mr-2" onClick={() => editUnidadResponsable(rowData)} />
                 <Button icon="pi pi-trash" rounded outlined severity="danger" onClick={() => confirmDeleteUnidadResponsable(rowData)} />
             </React.Fragment>
@@ -172,7 +197,7 @@ export default function CRUDUnidadResponsable() {
 
     const header = (
         <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
-            <h4 className="m-0">Gestión de Unidades Responsables</h4>
+            <h4 className="m-0">Gestión de Unidad Responsable</h4>
             <IconField iconPosition="left">
                 <InputIcon className="pi pi-search" />
                 <InputText type="search" placeholder="Buscar..." onInput={(e) => {
@@ -240,8 +265,18 @@ export default function CRUDUnidadResponsable() {
                 <div className="confirmation-content">
                     <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                     {unidadResponsable && (
-                        <span>¿Estás seguro de eliminar la unidad <b>{unidadResponsable.nombreUnidadResponsable}</b>?</span>
+                        <span>
+                            ¿Estas seguro de eliminar a <b>{unidadResponsable.nombreUnidadResponsable}</b>?
+                        </span>
                     )}
+                </div>
+            </Dialog>
+            <Dialog visible={unidadResponsableListado} style={{ width: '32rem' }}
+                breakpoints={{ '960px': '75vw', '641px': '90vw' }}
+                header="Usuario de unidad responsable" modal className="p-fluid"
+                onHide={hideListadoDialog}>
+                <div className="field">
+                    <ul>{ListaUsuario.map(item => <li>{item.nombre}</li>)}</ul>
                 </div>
             </Dialog>
         </div>
