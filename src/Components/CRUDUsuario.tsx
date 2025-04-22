@@ -142,7 +142,7 @@ export default function CRUDUsuario() {
     const listarRoles = (usuario: Usuario) => {
         setUsuario({ ...usuario });
         UsuarioService.findById(usuario.idUsuario).then((response) => {
-            setListaRoles(response.data.roles); // Asignar la lista de roles al estado
+            setListaRoles(response.data.rol); // Asignar la lista de roles al estado
         }).catch(error => {
             console.log(error);
         })
