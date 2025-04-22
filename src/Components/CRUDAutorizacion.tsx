@@ -1,37 +1,32 @@
-import React, {useState, useEffect, useRef} from 'react';
-import {classNames} from 'primereact/utils';
-import {DataTable} from 'primereact/datatable'; 
-import {Column} from 'primereact/column' ;
-import {Toast} from 'primereact/toast' ; 
-import {Button} from 'primereact/button';
-import {Toolbar} from 'primereact/toolbar' ;
-import {IconField} from 'primereact/iconfield' ;
-import {InputIcon} from 'primereact/inputicon'; 
-import {Dialog} from 'primereact/dialog';
-import {InputText} from 'primereact/inputtext' ;
+import React, { useState, useEffect, useRef } from 'react';
+import { classNames } from 'primereact/utils';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import { Toast } from 'primereact/toast';
+import { Button } from 'primereact/button';
+import { Toolbar } from 'primereact/toolbar';
+import { IconField } from 'primereact/iconfield';
+import { InputIcon } from 'primereact/inputicon';
+import { Dialog } from 'primereact/dialog';
+import { InputText } from 'primereact/inputtext';
 import AutorizacionService from '../Services/AutorizacionService';
 
 interface Autorizacion {
     id_autorizacion: number;
-    asignado_por: string;
-    asignado_por_cargo: string;
-    autorizado_por: string;
-    autorizado_por_cargo: string;
-    ejecucion_por: string;
-    ejecucion_por_cargo: string;
     elaborado_por: string;
     elaborado_por_cargo: string;
-    recibido_por: string;
-    recibido_por_cargo: string;
-    ruta_firma_asignado_por: string;
-    ruta_firma_autorizado_por: string;
-    ruta_firma_ejecucion_por: string;
-    ruta_firma_elaborado_por: string;
-    ruta_firma_recibido_por: string;
-    ruta_firma_vo_bo_por: string;
-    vo_bo_por: string;
     vo_bo_por_cargo: string;
-  }
+    autorizado_por_cargo: string;
+    recibido_por_cargo: string;
+    asignado_por_cargo: string;
+    ejecucion_por_cargo: string;
+    ruta_firma_elaborado_por: string;
+    ruta_firma_vo_bo_por: string;
+    ruta_firma_autorizado_por: string;
+    ruta_firma_recibido_por: string;
+    ruta_firma_asignado_por: string;
+    ruta_firma_ejecucion_por: string;
+}
 
 interface Planificacion {
     idPlanificacion: number;
@@ -43,34 +38,29 @@ interface Planificacion {
 
 export default function CRUDAutorizacion() {
     const emptyAurizacion: Autorizacion = {
-        
+
         id_autorizacion: 0,
-        asignado_por: '',
-        asignado_por_cargo: '',
-        autorizado_por: '',
-        autorizado_por_cargo: '',
-        ejecucion_por: '',
-        ejecucion_por_cargo: '',
         elaborado_por: '',
         elaborado_por_cargo: '',
-        recibido_por: '',
+        vo_bo_por_cargo: '',
+        autorizado_por_cargo: '',
         recibido_por_cargo: '',
-        ruta_firma_asignado_por: '',
-        ruta_firma_autorizado_por: '',
-        ruta_firma_ejecucion_por: '',
+        asignado_por_cargo: '',
+        ejecucion_por_cargo: '',
         ruta_firma_elaborado_por: '',
-        ruta_firma_recibido_por: '',
         ruta_firma_vo_bo_por: '',
-        vo_bo_por: '',
-        vo_bo_por_cargo: ''
+        ruta_firma_autorizado_por: '',
+        ruta_firma_recibido_por: '',
+        ruta_firma_asignado_por: '',
+        ruta_firma_ejecucion_por: ''
     };
-//lista de roles
+    //lista de roles
     const [listaPlanificaciones, setListaPlanificaciones] = useState<Planificacion[]>([]);
     const [autorizaciones, setAutorizaciones] = useState<Autorizacion[]>([]);
     const [autorizacion, setAutorizacion] = useState<Autorizacion>(emptyAurizacion);
     const [autorizacionDialog, setAutorizacionDialog] = useState<boolean>(false);
     const [deleteAutorizacionDialog, setDeleteAutorizacionDialog] = useState<boolean>(false);
-//agregado para el listado de usuarios
+    //agregado para el listado de usuarios
     const [autorizacionListado, setAutorizacionListado] = useState<boolean>(false);
     const [submitted, setSubmitted] = useState<boolean>(false);
     const [globalFilter, setGlobalFilter] = useState<string>('');
@@ -86,7 +76,7 @@ export default function CRUDAutorizacion() {
         setSubmitted(false);
         setAutorizacionDialog(true);
     };
-//ocultar listado de roles
+    //ocultar listado de roles
     const hideListadoDialog = () => {
         setSubmitted(false);
         setAutorizacionListado(false);
@@ -102,9 +92,9 @@ export default function CRUDAutorizacion() {
         setDeleteAutorizacionDialog(false);
     };
 
-    const saveAutorizacion = async() => {
+    const saveAutorizacion = async () => {
         setSubmitted(true);
-        if (autorizacion.asignado_por.trim()) {
+        if (autorizacion.elaborado_por.trim()) {
             let _autorizaciones = [...autorizaciones];
             let _autorizacion = { ...autorizacion };
 
@@ -112,19 +102,21 @@ export default function CRUDAutorizacion() {
                 AutorizacionService.update(autorizacion.id_autorizacion, autorizacion);
                 const index = findIndexById(autorizacion.id_autorizacion);
                 _autorizaciones[index] = _autorizacion;
-                toast.current?.show({ 
-                    severity: 'success', 
-                    summary: 'Exito', 
-                    detail: 'Autorizacion actualizado', 
-                    life: 3000 });
+                toast.current?.show({
+                    severity: 'success',
+                    summary: 'Exito',
+                    detail: 'Autorizacion actualizado',
+                    life: 3000
+                });
             } else {
                 _autorizacion.id_autorizacion = await getIdAutorizacion(_autorizacion);
                 _autorizaciones.push(_autorizacion);
-                toast.current?.show({ 
-                    severity: 'success', 
-                    summary: 'exito', 
-                    detail: 'Autorizacion creado', 
-                    life: 3000 });
+                toast.current?.show({
+                    severity: 'success',
+                    summary: 'exito',
+                    detail: 'Autorizacion creado',
+                    life: 3000
+                });
             }
 
             setAutorizaciones(_autorizaciones);
@@ -133,42 +125,36 @@ export default function CRUDAutorizacion() {
         }
     };
 
-    const getIdAutorizacion = async(autorizacion: Autorizacion) => {
+    const getIdAutorizacion = async (autorizacion: Autorizacion) => {
         let idAutorizacion = 0;
         const newAutorizacion = {
-            
-            id_autorizacion: 0,
-            asignado_por: autorizacion.asignado_por,
-            asignado_por_cargo: autorizacion.asignado_por_cargo,
-            autorizado_por: autorizacion.autorizado_por,
-            autorizado_por_cargo: autorizacion.autorizado_por_cargo,
-            ejecucion_por: autorizacion.ejecucion_por,
-            ejecucion_por_cargo: autorizacion.ejecucion_por_cargo,
+
             elaborado_por: autorizacion.elaborado_por,
             elaborado_por_cargo: autorizacion.elaborado_por_cargo,
-            recibido_por: autorizacion.recibido_por,
+            vo_bo_por_cargo: autorizacion.vo_bo_por_cargo,
+            autorizado_por_cargo: autorizacion.autorizado_por_cargo,
             recibido_por_cargo: autorizacion.recibido_por_cargo,
-            ruta_firma_asignado_por: autorizacion.ruta_firma_asignado_por,
-            ruta_firma_autorizado_por: autorizacion.ruta_firma_autorizado_por,
-            ruta_firma_ejecucion_por: autorizacion.ruta_firma_ejecucion_por,
+            asignado_por_cargo: autorizacion.asignado_por_cargo,
+            ejecucion_por_cargo: autorizacion.ejecucion_por_cargo,
             ruta_firma_elaborado_por: autorizacion.ruta_firma_elaborado_por,
-            ruta_firma_recibido_por: autorizacion.ruta_firma_recibido_por,
             ruta_firma_vo_bo_por: autorizacion.ruta_firma_vo_bo_por,
-            vo_bo_por: autorizacion.vo_bo_por,
-            vo_bo_por_cargo: autorizacion.vo_bo_por_cargo
+            ruta_firma_autorizado_por: autorizacion.ruta_firma_autorizado_por,
+            ruta_firma_recibido_por: autorizacion.ruta_firma_recibido_por,
+            ruta_firma_asignado_por: autorizacion.ruta_firma_asignado_por,
+            ruta_firma_ejecucion_por: autorizacion.ruta_firma_ejecucion_por
 
         };
         await AutorizacionService.create(newAutorizacion).then((response) => {
-            idAutorizacion = response.data.idUsuario; 
+            idAutorizacion = response.data.idUsuario;
         }).catch((error) => {
             console.log(error);
         });
-        return idAutorizacion;   
-    }; 
-    
+        return idAutorizacion;
+    };
+
     //listar roles
     const listarRoles = (autorizacion: Autorizacion) => {
-        setAutorizacion({...autorizacion});
+        setAutorizacion({ ...autorizacion });
         AutorizacionService.findById(autorizacion.id_autorizacion).then((response) => {
             setListaPlanificaciones(response.data.roles); // Asignar la lista de roles al estado
         }).catch(error => {
@@ -188,14 +174,16 @@ export default function CRUDAutorizacion() {
     };
 
     const deleteAutorizacion = () => {
-        const _autorizaciones = autorizaciones.filter((val) => val.id_autorizacion !== 
-        autorizacion.id_autorizacion);
+        const _autorizaciones = autorizaciones.filter((val) => val.id_autorizacion !==
+            autorizacion.id_autorizacion);
         AutorizacionService.delete(autorizacion.id_autorizacion);
         setAutorizaciones(_autorizaciones);
         setDeleteAutorizacionDialog(false);
         setAutorizacion(emptyAurizacion);
-        toast.current?.show({ severity: 'success', summary: 'Exito', 
-            detail: 'Usuario eliminado', life: 3000 });
+        toast.current?.show({
+            severity: 'success', summary: 'Exito',
+            detail: 'Usuario eliminado', life: 3000
+        });
     };
     const findIndexById = (idAutorizacion: number) => {
         let index = -1;
@@ -215,59 +203,46 @@ export default function CRUDAutorizacion() {
         const _autorizacion = { ...autorizacion };
         switch (numCampo) {
             case 1:
-                _autorizacion.asignado_por = val;
+                _autorizacion.elaborado_por = val;
                 break;
             case 2:
-                _autorizacion.asignado_por_cargo = val;
+                _autorizacion.elaborado_por_cargo = val;
                 break;
             case 3:
-                _autorizacion.autorizado_por = val;
+                _autorizacion.vo_bo_por_cargo = val;
                 break;
             case 4:
                 _autorizacion.autorizado_por_cargo = val;
                 break;
             case 5:
-                _autorizacion.ejecucion_por = val;
+                _autorizacion.recibido_por_cargo = val;
                 break;
             case 6:
-                _autorizacion.ejecucion_por_cargo = val;
+                _autorizacion.asignado_por_cargo = val;
                 break;
             case 7:
-                _autorizacion.elaborado_por = val;
+                _autorizacion.ejecucion_por_cargo = val;
                 break;
             case 8:
-                _autorizacion.elaborado_por_cargo = val;
+                _autorizacion.ruta_firma_elaborado_por = val;
                 break;
             case 9:
-                _autorizacion.recibido_por = val;
-                break; 
+                _autorizacion.ruta_firma_vo_bo_por = val;
+                break;
             case 10:
-                _autorizacion.recibido_por_cargo = val;
-                break; 
-            case 11:
-                _autorizacion.ruta_firma_asignado_por = val;
-                break; 
-            case 12:
                 _autorizacion.ruta_firma_autorizado_por = val;
-                break; 
+                break;
+            case 11:
+                _autorizacion.ruta_firma_recibido_por = val;
+                break;
+            case 12:
+                _autorizacion.ruta_firma_asignado_por = val;
+                break;
             case 13:
                 _autorizacion.ruta_firma_ejecucion_por = val;
-                break; 
-            case 14:
-                _autorizacion.ruta_firma_elaborado_por = val;
-                break; 
-            case 15:
-                _autorizacion.ruta_firma_recibido_por = val;
-                break; 
-            case 16:
-                _autorizacion.ruta_firma_vo_bo_por = val;
-                break; 
-            case 17:
-                _autorizacion.vo_bo_por = val;
-                break; 
-            case 18:
-                _autorizacion.vo_bo_por_cargo = val;
                 break;
+
+
         }
 
         setAutorizacion(_autorizacion);
@@ -275,19 +250,19 @@ export default function CRUDAutorizacion() {
     const leftToolbarTemplate = () => {
         return (
             <div className="flex flex-wrap gap-2">
-                <Button label="Nuevo" icon="pi pi-plus" severity="success" 
-                onClick={openNew} />
+                <Button label="Nuevo" icon="pi pi-plus" severity="success"
+                    onClick={openNew} />
             </div>
         );
     };
     const rightToolbarTemplate = () => {
         return <Button label="Exportar" icon="pi pi-upload" className=
-        "p-button-help" onClick={exportCSV} />;
+            "p-button-help" onClick={exportCSV} />;
     };
     const actionBodyTemplate = (rowData: Autorizacion) => {
         return (
             <React.Fragment>
-                <Button icon="pi pi-prime" style={{color: 'green'}}rounded outlined className='mr-2' onClick={()=> listarRoles(rowData)}/>
+                <Button icon="pi pi-prime" style={{ color: 'green' }} rounded outlined className='mr-2' onClick={() => listarRoles(rowData)} />
                 <Button icon="pi pi-pencil" rounded outlined className='mr-2' onClick={() => editAutorizacion(rowData)} />
                 <Button icon="pi pi-trash" rounded outlined severity="danger" onClick={() => confirmDeleteObjeto(rowData)} />
             </React.Fragment>
@@ -298,7 +273,7 @@ export default function CRUDAutorizacion() {
             <h4 className="m-0">Gestion de roles</h4>
             <IconField iconPosition="left">
                 <InputIcon className="pi pi-search" />
-                 <InputText type="search" placeholder="Search..." onInput={(e) => {const target = e.target as HTMLInputElement; setGlobalFilter(target.value);}}  />
+                <InputText type="search" placeholder="Search..." onInput={(e) => { const target = e.target as HTMLInputElement; setGlobalFilter(target.value); }} />
             </IconField>
         </div>
     );
@@ -321,81 +296,58 @@ export default function CRUDAutorizacion() {
                 <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                 <DataTable ref={dt} value={autorizaciones} dataKey="id_autorizacion"
-                    paginator rows={10} rowsPerPageOptions={[5, 10, 25]} paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} usuarios" 
+                    paginator rows={10} rowsPerPageOptions={[5, 10, 25]} paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} usuarios"
                     globalFilter={globalFilter} header={header}
                 >
                     <Column selectionMode="multiple" exportable={false}></Column>
-                    
                     <Column field="id_autorizacion" header="ID Autorizacion" sortable style={{ minWidth: '12rem' }}></Column>
-                    <Column field="asignado_por" header="Asignado por" sortable style={{ minWidth: '12rem' }}></Column>
-                    <Column field="asignado_por_cargo" header="Cargo Asignado" sortable style={{ minWidth: '12rem' }}></Column>
-                    <Column field="autorizado_por" header="Autorizado por" sortable style={{ minWidth: '12rem' }}></Column>
-                    <Column field="autorizado_por_cargo" header="Cargo Autorizado" sortable style={{ minWidth: '12rem' }}></Column>
-                    <Column field="ejecucion_por" header="Ejecutado por" sortable style={{ minWidth: '12rem' }}></Column>
-                    <Column field="ejecucion_por_cargo" header="Cargo Ejecutado" sortable style={{ minWidth: '12rem' }}></Column>
-                    <Column field="elaborado_por" header="Elaborado por" sortable style={{ minWidth: '12rem' }}></Column>
-                    <Column field="elaborado_por_cargo" header="Cargo Elaborado" sortable style={{ minWidth: '12rem' }}></Column>
-                    <Column field="recibido_por" header="Recibido por" sortable style={{ minWidth: '12rem' }}></Column>
-                    <Column field="recibido_por_cargo" header="Cargo Recibido" sortable style={{ minWidth: '12rem' }}></Column>
-                    <Column field="ruta_firma_asignado_por" header="Ruta firma Asignado" sortable style={{ minWidth: '12rem' }}></Column>
-                    <Column field="ruta_firma_autorizado_por" header="Ruta firma Autorizado" sortable style={{ minWidth: '12rem' }}></Column>
-                    <Column field="ruta_firma_ejecucion_por" header="Ruta firma Ejecutado" sortable style={{ minWidth: '12rem' }}></Column>
-                    <Column field="ruta_firma_elaborado_por" header="Ruta firma Elaborado" sortable style={{ minWidth: '12rem' }}></Column>
-                    <Column field="ruta_firma_recibido_por" header="Ruta firma Recibido" sortable style={{ minWidth: '12rem' }}></Column>
-                    <Column field="ruta_firma_vo_bo_por" header="Ruta firma Vo Bo" sortable style={{ minWidth: '12rem' }}></Column>
-                    <Column field="vo_bo_por" header="Vo Bo por" sortable style={{ minWidth: '12rem' }}></Column>
-                    <Column field="vo_bo_por_cargo" header="Cargo Vo Bo" sortable style={{ minWidth: '12rem' }}></Column>
+                    <Column field="asignado_por_cargo" header="Asignado Por Cargo" sortable style={{ minWidth: '12rem' }}></Column>
+                    <Column field="ruta_firma_asignado_por" header="Ruta Firma Asignado Por" sortable style={{ minWidth: '12rem' }}></Column>
+                    <Column field="autorizado_por_cargo" header="Autorizado Por Cargo" sortable style={{ minWidth: '12rem' }}></Column>
+                    <Column field="ruta_firma_autorizado_por" header="Ruta Firma Autorizado Por" sortable style={{ minWidth: '12rem' }}></Column>
+                    <Column field="ejecucion_por_cargo" header="Ejecutado Por Cargo" sortable style={{ minWidth: '12rem' }}></Column>
+                    <Column field="ruta_firma_ejecucion_por" header="Ruta Firma Ejecutado Por" sortable style={{ minWidth: '12rem' }}></Column>
+                    <Column field="elaborado_por" header="Elaborado Por" sortable style={{ minWidth: '12rem' }}></Column>
+                    <Column field="elaborado_por_cargo" header="Elaborado Por Cargo" sortable style={{ minWidth: '12rem' }}></Column>
+                    <Column field="ruta_firma_elaborado_por" header="Ruta Firma Elaborado Por" sortable style={{ minWidth: '12rem' }}></Column>
+                    <Column field="recibido_por_cargo" header="Recibido Por Cargo" sortable style={{ minWidth: '12rem' }}></Column>
+                    <Column field="ruta_firma_recibido_por" header="Ruta Firma Recibido Por" sortable style={{ minWidth: '12rem' }}></Column>
+                    <Column field="vo_bo_por_cargo" header="Vo Bo Por Cargo" sortable style={{ minWidth: '12rem' }}></Column>
+                    <Column field="ruta_firma_vo_bo_por" header="Ruta Firma Vo Bo Por" sortable style={{ minWidth: '12rem' }}></Column>
                     <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
                 </DataTable>
             </div>
-            <Dialog visible={autorizacionDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} 
-            header="Detalles de la autorizacion" modal className="p-fluid" 
-            footer={objetoDialogFooter} onHide={hideDialog}>
-                
-                <div className="field">
-                    <label htmlFor="asignado_por">Asignado por</label>
-                    <InputText id="asignado_por" value={autorizacion.asignado_por} onChange={(e) => onInputChange(e, 1)} required autoFocus className={classNames({ 'p-invalid': submitted && !autorizacion.asignado_por })} />
-                    {submitted && !autorizacion.asignado_por && <small className="p-error">El nombre es requerido.</small>}
-                </div>
+            <Dialog visible={autorizacionDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }}
+                header="Detalles de la autorizacion" modal className="p-fluid"
+                footer={objetoDialogFooter} onHide={hideDialog}>
+
+
                 <div className="field">
                     <label htmlFor="asignado_por_cargo">Cargo Asignado</label>
                     <InputText id="asignado_por_cargo" value={autorizacion.asignado_por_cargo} onChange={(e) => onInputChange(e, 2)} required autoFocus className={classNames({ 'p-invalid': submitted && !autorizacion.asignado_por_cargo })} />
                     {submitted && !autorizacion.asignado_por_cargo && <small className="p-error">El cargo es requerido.</small>}
                 </div>
-                <div className="field">
-                    <label htmlFor="autorizado_por">Autorizado por</label>
-                    <InputText id="autorizado_por" value={autorizacion.autorizado_por} onChange={(e) => onInputChange(e, 3)} required autoFocus className={classNames({ 'p-invalid': submitted && !autorizacion.autorizado_por })} />
-                    {submitted && !autorizacion.autorizado_por && <small className="p-error">El nombre es requerido.</small>}
-                </div>
+
                 <div className="field">
                     <label htmlFor="autorizado_por_cargo">Cargo Autorizado</label>
                     <InputText id="autorizado_por_cargo" value={autorizacion.autorizado_por_cargo} onChange={(e) => onInputChange(e, 4)} required autoFocus className={classNames({ 'p-invalid': submitted && !autorizacion.autorizado_por_cargo })} />
                     {submitted && !autorizacion.autorizado_por_cargo && <small className="p-error">El cargo es requerido.</small>}
                 </div>
-                <div className="field">
-                    <label htmlFor="ejecucion_por">Ejecutado por</label>
-                    <InputText id="ejecucion_por" value={autorizacion.ejecucion_por} onChange={(e) => onInputChange(e, 5)} required autoFocus className={classNames({ 'p-invalid': submitted && !autorizacion.ejecucion_por })} />
-                    {submitted && !autorizacion.ejecucion_por && <small className="p-error">El nombre es requerido.</small>}
-                </div>
+
                 <div className="field">
                     <label htmlFor="ejecucion_por_cargo">Cargo Ejecutado</label>
                     <InputText id="ejecucion_por_cargo" value={autorizacion.ejecucion_por_cargo} onChange={(e) => onInputChange(e, 6)} required autoFocus className={classNames({ 'p-invalid': submitted && !autorizacion.ejecucion_por_cargo })} />
                     {submitted && !autorizacion.ejecucion_por_cargo && <small className="p-error">El cargo es requerido.</small>}
                 </div>
-                <div className="field"> 
+                <div className="field">
                     <label htmlFor="elaborado_por">Elaborado por</label>
                     <InputText id="elaborado_por" value={autorizacion.elaborado_por} onChange={(e) => onInputChange(e, 7)} required autoFocus className={classNames({ 'p-invalid': submitted && !autorizacion.elaborado_por })} />
                     {submitted && !autorizacion.elaborado_por && <small className="p-error">El nombre es requerido.</small>}
                 </div>
-                <div className="field"> 
+                <div className="field">
                     <label htmlFor="elaborado_por_cargo">Cargo Elaborado</label>
                     <InputText id="elaborado_por_cargo" value={autorizacion.elaborado_por_cargo} onChange={(e) => onInputChange(e, 8)} required autoFocus className={classNames({ 'p-invalid': submitted && !autorizacion.elaborado_por_cargo })} />
                     {submitted && !autorizacion.elaborado_por_cargo && <small className="p-error">El cargo es requerido.</small>}
-                </div>
-                <div className="field">
-                    <label htmlFor="recibido_por">Recibido por</label>
-                    <InputText id="recibido_por" value={autorizacion.recibido_por} onChange={(e) => onInputChange(e, 9)} required autoFocus className={classNames({ 'p-invalid': submitted && !autorizacion.recibido_por })} />
-                    {submitted && !autorizacion.recibido_por && <small className="p-error">El nombre es requerido.</small>}
                 </div>
                 <div className="field">
                     <label htmlFor="recibido_por_cargo">Cargo Recibido</label>
@@ -432,33 +384,29 @@ export default function CRUDAutorizacion() {
                     <InputText id="ruta_firma_vo_bo_por" value={autorizacion.ruta_firma_vo_bo_por} onChange={(e) => onInputChange(e, 16)} required autoFocus className={classNames({ 'p-invalid': submitted && !autorizacion.ruta_firma_vo_bo_por })} />
                     {submitted && !autorizacion.ruta_firma_vo_bo_por && <small className="p-error">La ruta es requerida.</small>}
                 </div>
-                <div className="field">
-                    <label htmlFor="vo_bo_por">Vo Bo por</label>
-                    <InputText id="vo_bo_por" value={autorizacion.vo_bo_por} onChange={(e) => onInputChange(e, 17)} required autoFocus className={classNames({ 'p-invalid': submitted && !autorizacion.vo_bo_por })} />
-                    {submitted && !autorizacion.vo_bo_por && <small className="p-error">El nombre es requerido.</small>}
-                </div>
+
                 <div className="field">
                     <label htmlFor="vo_bo_por_cargo">Cargo Vo Bo</label>
                     <InputText id="vo_bo_por_cargo" value={autorizacion.vo_bo_por_cargo} onChange={(e) => onInputChange(e, 18)} required autoFocus className={classNames({ 'p-invalid': submitted && !autorizacion.vo_bo_por_cargo })} />
                     {submitted && !autorizacion.vo_bo_por_cargo && <small className="p-error">El cargo es requerido.</small>}
                 </div>
             </Dialog>
-            <Dialog visible={deleteAutorizacionDialog} style={{ width: '32rem' }} 
-            breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Confirmar" 
-            modal footer={deleteObjetoDialogFooter} onHide={hideDeleteObjetoDialog}>
+            <Dialog visible={deleteAutorizacionDialog} style={{ width: '32rem' }}
+                breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Confirmar"
+                modal footer={deleteObjetoDialogFooter} onHide={hideDeleteObjetoDialog}>
                 <div className="confirmation-content">
                     <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                     {autorizacion && (
                         <span>
-                            ¿Estas seguro de eliminar a <b>{autorizacion.asignado_por}</b>?
+                            ¿Estas seguro de eliminar a <b>{autorizacion.elaborado_por}</b>?
                         </span>
                     )}
                 </div>
             </Dialog>
-            <Dialog visible={autorizacionListado} style={{ width: '32rem' }} 
-            breakpoints={{ '960px': '75vw', '641px': '90vw' }} 
-            header="Rol del usuario" modal className="p-fluid" 
-            onHide={hideListadoDialog}>
+            <Dialog visible={autorizacionListado} style={{ width: '32rem' }}
+                breakpoints={{ '960px': '75vw', '641px': '90vw' }}
+                header="Rol del usuario" modal className="p-fluid"
+                onHide={hideListadoDialog}>
                 <div className="field">
                     <ul>{listaPlanificaciones.map(item => <li>{item.idPlanificacion}</li>)}</ul>
                 </div>
