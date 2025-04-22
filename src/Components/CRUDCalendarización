@@ -1,1 +1,48 @@
+import React, {useState, useEffect, useRef} from 'react';
+import {classNames} from 'primereact/utils';
+import {DataTable} from 'primereact/datatable'; 
+import {Column} from 'primereact/column' ;
+import {Toast} from 'primereact/toast' ; 
+import {Button} from 'primereact/button';
+import {Toolbar} from 'primereact/toolbar' ;
+import {IconField} from 'primereact/iconfield' ;
+import {InputIcon} from 'primereact/inputicon'; 
+import {Dialog} from 'primereact/dialog';
+import {InputText} from 'primereact/inputtext' ;
+import CalendarizacionService from "../services/CalendarizacionService.tsx";
 
+interface Calendarizacion {
+  idCalendarizacion: number;
+  mes: string;
+  cantidad: byte;
+  presupuesto: float;
+}
+
+interface CantidadAnual {
+  idCantidadAnual: number;
+}
+
+interface Actividad {
+  idActividad: number;
+}
+
+export default function CRUDCalendarizacionComponent() {
+  const emptyCalendarizacion: Calendarizacion = {
+    idCalendarizacion: 0,
+    mes: '',
+    cantidad: '',
+    presupuesto: ''
+  };
+
+  //Lista de fechas 
+  const[listaActividades, setListaActividades] = useState<Actividad[]>([]);
+  const [calendarizaciones, setCalendarizaciones] = useState<Calendarizacion[]>([]);
+  const [calendarizacion, setCalendarizacion] = useState<Calendarizacion>(emptyCalendarizacion);
+  const [calendarizacionDialog, setCalendarizacionDialog] = useState<boolean>(false);
+  const [deleteCalendarizacionDialog, setDeleteCalendarizacionDialog] = useState<boolean>(false);
+  const [calendarizacionListado, setCalendarizacionListado] = useState<boolean>(false);
+  const [submitted, setSubmitted] = useState<boolean>(false);
+  const [globalFilter, setGlobalFilter] = useState<string>('');
+  const toast = useRef<Toast>(null);
+  const dt = useRef<DataTable<Cliente[]>>(null);
+}
