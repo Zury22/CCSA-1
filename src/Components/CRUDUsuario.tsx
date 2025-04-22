@@ -1,29 +1,30 @@
-
-import React, {useState, useEffect, useRef} from 'react';
-import {classNames} from 'primereact/utils';
-import {DataTable} from 'primereact/datatable'; 
-import {Column} from 'primereact/column' ;
-import {Toast} from 'primereact/toast' ; 
-import {Button} from 'primereact/button';
-import {Toolbar} from 'primereact/toolbar' ;
-import {IconField} from 'primereact/iconfield' ;
-import {InputIcon} from 'primereact/inputicon'; 
-import {Dialog} from 'primereact/dialog';
-import {InputText} from 'primereact/inputtext' ;
+import React, { useState, useEffect, useRef } from 'react';
+import { classNames } from 'primereact/utils';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import { Toast } from 'primereact/toast';
+import { Button } from 'primereact/button';
+import { Toolbar } from 'primereact/toolbar';
+import { IconField } from 'primereact/iconfield';
+import { InputIcon } from 'primereact/inputicon';
+import { Dialog } from 'primereact/dialog';
+import { InputText } from 'primereact/inputtext';
 import UsuarioService from '../Services/UsuarioService';
-
+import UnidadResponsableService from '../Services/UnidadResponsableService';
+import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
 
 interface Usuario {
-  idUsuario: number;
-  contraseña: string;
-  correo: string;
-  nombre: string;
+    idUsuario: number;
+    contraseña: string;
+    correo: string;
+    nombre: string;
+    unidadResponsable: UnidadResponsable;
 }
 
 interface Rol {
-  idRol: number;
-  nombreRol: string;
-  permisos: string;
+    idRol: number;
+    nombreRol: string;
+    permisos: string;
 }
 
 interface UnidadResponsable {
@@ -32,37 +33,46 @@ interface UnidadResponsable {
     nombreUnidadResponsable: string;
 }
 
+
 export default function CRUDUsuario() {
+    const emptyUnidadResponsable: UnidadResponsable = {
+        idUnidadResponsable: 0,
+        jefeUnidad: '',
+        nombreUnidadResponsable: ''
+    };
     const emptyUsuario: Usuario = {
         idUsuario: 0,
         contraseña: '',
         correo: '',
-        nombre: ''
+        nombre: '',
+        unidadResponsable: emptyUnidadResponsable
     };
-//lista de roles
+    const [unidadesResponsables, setUnidadesResponsables] = useState<UnidadResponsable[]>([]);
+    //lista de roles
     const [listaRoles, setListaRoles] = useState<Rol[]>([]);
-    const [listaUnidadResponsable, setListaUnidadResponsable] = useState<UnidadResponsable[]>([]);
     const [usuarios, setUsuarios] = useState<Usuario[]>([]);
     const [usuario, setUsuario] = useState<Usuario>(emptyUsuario);
     const [usuarioDialog, setUsuarioDialog] = useState<boolean>(false);
     const [deleteUsuarioDialog, setDeleteUsuarioDialog] = useState<boolean>(false);
-//agregado para el listado de usuarios
+    //agregado para el listado de usuarios
     const [usuarioListado, setUsuarioListado] = useState<boolean>(false);
     const [submitted, setSubmitted] = useState<boolean>(false);
     const [globalFilter, setGlobalFilter] = useState<string>('');
     const toast = useRef<Toast>(null);
     const dt = useRef<DataTable<Usuario[]>>(null);
+    const [selectedUnidadResponsable, setSelectedUnidadResponsable] = useState<UnidadResponsable| null>(null);
 
     useEffect(() => {
+        UnidadResponsableService.findAll().then((response) => setUnidadesResponsables(response.data));
         UsuarioService.findAll().then((response) => setUsuarios(response.data));
-    }, []);
+    }, [selectedUnidadResponsable]);
 
     const openNew = () => {
         setUsuario(emptyUsuario);
         setSubmitted(false);
         setUsuarioDialog(true);
     };
-//ocultar listado de roles
+    //ocultar listado de roles
     const hideListadoDialog = () => {
         setSubmitted(false);
         setUsuarioListado(false);
@@ -78,7 +88,7 @@ export default function CRUDUsuario() {
         setDeleteUsuarioDialog(false);
     };
 
-    const saveUsuario = async() => {
+    const saveUsuario = async () => {
         setSubmitted(true);
         if (usuario.nombre.trim()) {
             let _usuarios = [...usuarios];
@@ -88,19 +98,21 @@ export default function CRUDUsuario() {
                 UsuarioService.update(usuario.idUsuario, usuario);
                 const index = findIndexById(usuario.idUsuario);
                 _usuarios[index] = _usuario;
-                toast.current?.show({ 
-                    severity: 'success', 
-                    summary: 'Exito', 
-                    detail: 'Usuario actualizado', 
-                    life: 3000 });
+                toast.current?.show({
+                    severity: 'success',
+                    summary: 'Exito',
+                    detail: 'Usuario actualizado',
+                    life: 3000
+                });
             } else {
                 _usuario.idUsuario = await getIdUsuario(_usuario);
                 _usuarios.push(_usuario);
-                toast.current?.show({ 
-                    severity: 'success', 
-                    summary: 'exito', 
-                    detail: 'Usuario creado', 
-                    life: 3000 });
+                toast.current?.show({
+                    severity: 'success',
+                    summary: 'exito',
+                    detail: 'Usuario creado',
+                    life: 3000
+                });
             }
 
             setUsuarios(_usuarios);
@@ -109,26 +121,26 @@ export default function CRUDUsuario() {
         }
     };
 
-    const getIdUsuario = async(usuario: Usuario) => {
+    const getIdUsuario = async (usuario: Usuario) => {
         let idUsuario = 0;
         const newUsuario = {
             nombre: usuario.nombre,
             contraseña: usuario.contraseña,
             correo: usuario.correo,
-           // idRol: usuario.idRol
+            // idRol: usuario.idRol
 
         };
         await UsuarioService.create(newUsuario).then((response) => {
-            idUsuario = response.data.idUsuario; 
+            idUsuario = response.data.idUsuario;
         }).catch((error) => {
             console.log(error);
         });
-        return idUsuario;   
-    }; 
-    
+        return idUsuario;
+    };
+
     //listar roles
     const listarRoles = (usuario: Usuario) => {
-        setUsuario({...usuario});
+        setUsuario({ ...usuario });
         UsuarioService.findById(usuario.idUsuario).then((response) => {
             setListaRoles(response.data.roles); // Asignar la lista de roles al estado
         }).catch(error => {
@@ -137,18 +149,10 @@ export default function CRUDUsuario() {
         setUsuarioListado(true);
     };
 
-    const listarUnidadResponsable = (usuario: Usuario) => {
-        setUsuario({...usuario});
-        UsuarioService.findById(usuario.idUsuario).then((response) => {
-            setListaUnidadResponsable(response.data.UnidadResponsable); // Asignar la lista de roles al estado
-        }).catch(error => {
-            console.log(error);
-        })
-        setUsuarioListado(true);
-    };
-
     const editUsuario = (usuario: Usuario) => {
         setUsuario({ ...usuario });
+        //await UsuarioService.findById(usuario.idUsuario).then((response) => {   
+       // });
         setUsuarioDialog(true);
     };
 
@@ -156,16 +160,18 @@ export default function CRUDUsuario() {
         setUsuario(usuario);
         setDeleteUsuarioDialog(true);
     };
-//rol
+
     const deleteUsuario = () => {
-        const _usuarios = usuarios.filter((val) => val.idUsuario !== 
-        usuario.idUsuario);
+        const _usuarios = usuarios.filter((val) => val.idUsuario !==
+            usuario.idUsuario);
         UsuarioService.delete(usuario.idUsuario);
         setUsuarios(_usuarios);
         setDeleteUsuarioDialog(false);
         setUsuario(emptyUsuario);
-        toast.current?.show({ severity: 'success', summary: 'Exito', 
-            detail: 'Usuario eliminado', life: 3000 });
+        toast.current?.show({
+            severity: 'success', summary: 'Exito',
+            detail: 'Usuario eliminado', life: 3000
+        });
     };
     const findIndexById = (idUsuario: number) => {
         let index = -1;
@@ -199,23 +205,31 @@ export default function CRUDUsuario() {
 
         setUsuario(_usuario);
     };
+
+    const onUnidadResponsableChange = (e: DropdownChangeEvent) => {
+        const _usuario = {...usuario};
+        const xUnidadResponsable: UnidadResponsable = e.target.value;
+        setSelectedUnidadResponsable(xUnidadResponsable);
+        _usuario.unidadResponsable = xUnidadResponsable;
+        setUsuario(_usuario);
+        
+    }
     const leftToolbarTemplate = () => {
         return (
             <div className="flex flex-wrap gap-2">
-                <Button label="Nuevo" icon="pi pi-plus" severity="success" 
-                onClick={openNew} />
+                <Button label="Nuevo" icon="pi pi-plus" severity="success"
+                    onClick={openNew} />
             </div>
         );
     };
     const rightToolbarTemplate = () => {
         return <Button label="Exportar" icon="pi pi-upload" className=
-        "p-button-help" onClick={exportCSV} />;
+            "p-button-help" onClick={exportCSV} />;
     };
     const actionBodyTemplate = (rowData: Usuario) => {
         return (
             <React.Fragment>
-                <Button icon="pi pi-prime" style={{color: 'green'}}rounded outlined className='mr-2' onClick={()=> listarRoles(rowData)}/>
-                <Button icon="pi pi-users" style={{color: 'blue'}} rounded outlined className='mr-2' onClick={()=> listarUnidadResponsable(rowData)}/>
+                <Button icon="pi pi-prime" style={{ color: 'green' }} rounded outlined className='mr-2' onClick={() => listarRoles(rowData)} />
                 <Button icon="pi pi-pencil" rounded outlined className='mr-2' onClick={() => editUsuario(rowData)} />
                 <Button icon="pi pi-trash" rounded outlined severity="danger" onClick={() => confirmDeleteObjeto(rowData)} />
             </React.Fragment>
@@ -223,10 +237,10 @@ export default function CRUDUsuario() {
     };
     const header = (
         <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
-            <h4 className="m-0">Gestion de usuarios</h4>
+            <h4 className="m-0">Gestion de roles</h4>
             <IconField iconPosition="left">
                 <InputIcon className="pi pi-search" />
-                 <InputText type="search" placeholder="Search..." onInput={(e) => {const target = e.target as HTMLInputElement; setGlobalFilter(target.value);}}  />
+                <InputText type="search" placeholder="Search..." onInput={(e) => { const target = e.target as HTMLInputElement; setGlobalFilter(target.value); }} />
             </IconField>
         </div>
     );
@@ -249,7 +263,7 @@ export default function CRUDUsuario() {
                 <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                 <DataTable ref={dt} value={usuarios} dataKey="idUsuario"
-                    paginator rows={10} rowsPerPageOptions={[5, 10, 25]} paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} usuarios" 
+                    paginator rows={10} rowsPerPageOptions={[5, 10, 25]} paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} usuarios"
                     globalFilter={globalFilter} header={header}
                 >
                     <Column selectionMode="multiple" exportable={false}></Column>
@@ -260,37 +274,45 @@ export default function CRUDUsuario() {
                     <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
                 </DataTable>
             </div>
-            <Dialog visible={usuarioDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} 
-            header="Detalles del usuario" modal className="p-fluid" 
-            footer={objetoDialogFooter} onHide={hideDialog}>
+            <Dialog visible={usuarioDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }}
+                header="Detalles del usuario" modal className="p-fluid"
+                footer={objetoDialogFooter} onHide={hideDialog}>
                 <div className="field">
                     <label htmlFor="nombre" className="font-bold">
                         Nombre
                     </label>
-                    <InputText id="nombre" value={usuario.nombre} onChange={(e) => onInputChange(e, 1)} required autoFocus 
-                    className={classNames({ 'p-invalid': submitted && !usuario.nombre })} />
+                    <InputText id="nombre" value={usuario.nombre} onChange={(e) => onInputChange(e, 1)} required autoFocus
+                        className={classNames({ 'p-invalid': submitted && !usuario.nombre })} />
                     {submitted && !usuario.nombre && <small className="p-error">El nombre es requerido</small>}
                 </div>
                 <div className="field">
                     <label htmlFor="correo" className="font-bold">
                         Correo
                     </label>
-                    <InputText id="correo" value={usuario.correo} onChange={(e) => onInputChange(e, 2)} required autoFocus 
-                    className={classNames({ 'p-invalid': submitted && !usuario.correo })} />
+                    <InputText id="correo" value={usuario.correo} onChange={(e) => onInputChange(e, 2)} required autoFocus
+                        className={classNames({ 'p-invalid': submitted && !usuario.correo })} />
                     {submitted && !usuario.correo && <small className="p-error">El correo es requerido</small>}
                 </div>
                 <div className="field">
                     <label htmlFor="contraseña" className="font-bold">
                         Correo
                     </label>
-                    <InputText id="contraseña" value={usuario.contraseña} onChange={(e) => onInputChange(e, 3)} required autoFocus 
-                    className={classNames({ 'p-invalid': submitted && !usuario.contraseña })} />
+                    <InputText id="contraseña" value={usuario.contraseña} onChange={(e) => onInputChange(e, 3)} required autoFocus
+                        className={classNames({ 'p-invalid': submitted && !usuario.contraseña })} />
                     {submitted && !usuario.contraseña && <small className="p-error">La contraseña es requerida</small>}
                 </div>
+                <div className="field">
+                                    <label className="font-bold block mb-2">Usuario:{
+                                        selectedUnidadResponsable?.nombreUnidadResponsable}</label>
+                                    <Dropdown value={selectedUnidadResponsable} onChange={
+                                        onUnidadResponsableChange} options={unidadesResponsables} optionLabel="nombre"  
+                                        placeholder="Seleccione una unidad responsable"  className="w-full md:w-14rem" />
+                </div>
+
             </Dialog>
-            <Dialog visible={deleteUsuarioDialog} style={{ width: '32rem' }} 
-            breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Confirmar" 
-            modal footer={deleteObjetoDialogFooter} onHide={hideDeleteObjetoDialog}>
+            <Dialog visible={deleteUsuarioDialog} style={{ width: '32rem' }}
+                breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Confirmar"
+                modal footer={deleteObjetoDialogFooter} onHide={hideDeleteObjetoDialog}>
                 <div className="confirmation-content">
                     <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                     {usuario && (
@@ -300,20 +322,12 @@ export default function CRUDUsuario() {
                     )}
                 </div>
             </Dialog>
-            <Dialog visible={usuarioListado} style={{ width: '32rem' }} 
-            breakpoints={{ '960px': '75vw', '641px': '90vw' }} 
-            header="Rol del usuario" modal className="p-fluid" 
-            onHide={hideListadoDialog}>
+            <Dialog visible={usuarioListado} style={{ width: '32rem' }}
+                breakpoints={{ '960px': '75vw', '641px': '90vw' }}
+                header="Rol del usuario" modal className="p-fluid"
+                onHide={hideListadoDialog}>
                 <div className="field">
                     <ul>{listaRoles.map(item => <li>{item.nombreRol}</li>)}</ul>
-                </div>
-            </Dialog>
-            <Dialog visible={usuarioListado} style={{ width: '32rem' }} 
-            breakpoints={{ '960px': '75vw', '641px': '90vw' }} 
-            header="Unidad responsable del usuario" modal className="p-fluid" 
-            onHide={hideListadoDialog}>
-                <div className="field">
-                    <ul>{listaUnidadResponsable.map(item => <li>{item.nombreUnidadResponsable}</li>)}</ul>
                 </div>
             </Dialog>
         </div>

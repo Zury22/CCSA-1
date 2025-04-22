@@ -13,20 +13,21 @@ import RolService from '../Services/RolService';
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
 import UsuarioService from '../Services/UsuarioService';
 
+
+//Define la interfaz mascota con los campos necesarios para un registro
+interface Rol {
+    idRol: number;
+    nombreRol: string;
+    permisos: string;
+    //se incluye el campo usuario como un objeto
+    usuario: Usuario;
+  }
 //interfaz para modelar a los clientes
 interface Usuario {
     idUsuario: number;
     contraseña: string;
     correo: string;
     nombre: string;
-  }
-//Define la interfaz mascota con los campos necesarios para un registro
-  interface Rol {
-    idRol: number;
-    nombreRol: string;
-    permisos: string;
-    //se incluye el campo usuario como un objeto
-    usuario: Usuario;
   }
 
   interface Permisos{
