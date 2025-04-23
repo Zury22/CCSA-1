@@ -44,5 +44,59 @@ export default function CRUDCalendarizacionComponent() {
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [globalFilter, setGlobalFilter] = useState<string>('');
   const toast = useRef<Toast>(null);
-  const dt = useRef<DataTable<Cliente[]>>(null);
+  const dt = useRef<DataTable<Calendarizacion[]>>(null);
 }
+useEffect(() => {
+  CalendarizacionService.findAll().then((response) => setCalendarizaciones(response.data));
+});
+
+const openNew = () => {
+  setCalendarizacion(emptyCalendarizacion);
+  setSubmitted(false);
+  setCalendarizacionDialog(true);
+};
+
+// Ocultar listado de calendarizaciones
+const hideListadoDialog = () => {
+  setSubmitted(false);
+  setCalendarizacionListado(false);
+};
+
+const hideDialog = () => {
+  setSubmitted(false);
+  setCalendarizacionDialog(false);
+};
+
+const hideDeleteObjetoDialog = () => {
+  setDeleteCalendarizacionDialog(false);
+};
+
+const saveCalendarizacion = async () => {
+  setSubmitted(true);
+  if (calendarizacion.nombre.trim()) {
+    const _calendarizacion = [...Calendarizaciones];
+    const _cliente = { ...cliente };
+    if (cliente.idCliente) {
+      ClienteService.update(cliente.idCliente, cliente);
+      const index = findIndexById(cliente.idCliente);
+      _clientes[index] = _cliente;
+      toast.current?.show({
+        severity: 'success',
+        summary: 'Éxito',
+        detail: 'Cliente Actualizado',
+        life: 3000
+      });
+    } else {
+      _cliente.idCliente = await getIdCliente(_cliente);
+      _clientes.push(_cliente);
+      toast.current?.show({
+        severity: 'success',
+        summary: 'Éxito',
+        detail: 'Cliente Creado',
+        life: 3000
+      });
+    }
+    setClientes(_clientes);
+    setClienteDialog(false);
+  }
+};
